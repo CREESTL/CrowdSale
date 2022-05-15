@@ -2,12 +2,14 @@ pragma solidity ^0.8.4;
 
 import "./TTT.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 
 // A crowdsale ICO contract
-contract TTTCrowdsale {
+contract TTTCrowdsale is Ownable{
 
   using SafeMath for uint256;
+  mapping(address => bool) public whitelist;
 
   // The token being sold
   TTT public token;
@@ -29,7 +31,6 @@ contract TTTCrowdsale {
     uint256 amount // amount tokens purchased
   );
 
-
   constructor(uint256 _rate, address _wallet, TTT _token) {
     require(_rate > 0, "Wrong Rate!");
     require(_wallet != address(0), "Wrong Wallet Address!");
@@ -40,7 +41,7 @@ contract TTTCrowdsale {
     token = _token;
   }
 
-
+  // Function to receive ether
   fallback() external payable {
     buyTokens(msg.sender);
   }
@@ -49,11 +50,35 @@ contract TTTCrowdsale {
     buyTokens(msg.sender);
   }
 
+  /*
+    WHITELISTS
+  */
+
+  // Reverts if beneficiary is not whitelisted
+  modifier isWhitelisted(address _beneficiary) {
+    require(whitelist[_beneficiary]);
+    _;
+  }
+
+  // Adds a single address to whitelist
+  function addToWhitelist(address _beneficiary) external onlyOwner {
+    whitelist[_beneficiary] = true;
+  }
+
+  // Removes a single address from whitelist
+  function removeFromWhitelist(address _beneficiary) external onlyOwner {
+    whitelist[_beneficiary] = false;
+  }
+
   // Pre-transaction checks
-  function preTransactionValidate(address _beneficiary, uint256 weiAmount) internal {
+  function preTransactionValidate(address _beneficiary, uint256 weiAmount) internal 
+    isWhitelisted(_beneficiary)
+  {
     require(_beneficiary != address(0), "Wrong Beneficiary!");
     require(weiAmount != 0, "Not Enough Wei!");
   }
+  // ======
+
 
   // Main function 
   // beneficiary - gets the tokens

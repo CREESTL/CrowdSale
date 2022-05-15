@@ -21,7 +21,6 @@ contract WhitelistedCrowdsale is Crowdsale, Ownable {
     _;
   }
 
-
   /**
    * @dev Adds single address to whitelist.
    * @param _beneficiary Address to be added to the whitelist
