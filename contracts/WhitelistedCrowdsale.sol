@@ -21,8 +21,6 @@ contract WhitelistedCrowdsale is Crowdsale, Ownable {
     _;
   }
 
-  constructor(uint256 _rate, address _wallet, TTT _token) Crowdsale (_rate, _wallet, _token){}
-
 
   /**
    * @dev Adds single address to whitelist.
