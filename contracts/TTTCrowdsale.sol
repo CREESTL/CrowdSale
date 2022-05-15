@@ -15,6 +15,8 @@ contract TTTCrowdsale is Ownable{
   // Opening and closing time of crowdsale
   uint256 public openingTime;
   uint256 public closingTime;
+  // End time of last of three phases
+  uint256 public phaseEndTime;
 
   // The token being sold
   TTT public token;
@@ -36,22 +38,24 @@ contract TTTCrowdsale is Ownable{
     uint256 amount // amount tokens purchased
   );
 
-  constructor(uint256 _rate, address _wallet, TTT _token, 
-              uint256 _openingTime, uint256 _closingTime) 
+  constructor(address _wallet, TTT _token, 
+              uint256 _openingTime) 
   {
-    require(_rate > 0, "Wrong Rate!");
     require(_wallet != address(0), "Wrong Wallet Address!");
     require(address(_token) != address(0), "Wrong Token Address!");
     // solium-disable-next-line security/no-block-members
     require(_openingTime >= block.timestamp, "Wrong Opening Time!");
-    require(_closingTime >= _openingTime, "Can't Close Before Open!");
 
-    rate = _rate;
+    // _rate = tokens * 10 ^ (decimals) / wei (sent)
+    // Default rate is 42
+    rate = 42;
     wallet = payable(_wallet);
     token = _token;
     openingTime = _openingTime;
-    closingTime = _closingTime;
-
+    // Closing time is exactly 3 days + 14 days + 30 days after opening time
+    closingTime = openingTime + 3 days + 2 weeks + 30 days;
+    // First phase lasts for 3 days since opening
+    phaseEndTime = openingTime + 3 days;
   }
 
   // Function to receive ether and sell tokens to the client
@@ -94,6 +98,21 @@ contract TTTCrowdsale is Ownable{
     _;
   }
 
+  // Changes phase according to current time
+  modifier checkChangePhase {
+    // After first 3 days starts the next 1-month phase
+    if (block.timestamp > phaseEndTime) {
+      // Assuming that 1 month has 30 days
+      phaseEndTime += 30 days;
+      rate = 21;
+    // After 1-month phase starts the last 2-weeks phase
+    } else if (block.timestamp > phaseEndTime) {
+      phaseEndTime += 2 weeks;
+      rate = 8;
+    }
+    _;
+  }
+
   // Checks whether the period in which the crowdsale is open has ended
   function hasClosed() public view returns (bool) {
     // solium-disable-next-line security/no-block-members
@@ -115,6 +134,7 @@ contract TTTCrowdsale is Ownable{
   function preTransactionValidate(address _beneficiary, uint256 weiAmount) internal 
     onlyWhiteListed(_beneficiary)
     onlyWhileOpen()
+    checkChangePhase()
   {
     require(_beneficiary != address(0), "Wrong Beneficiary!");
     require(weiAmount != 0, "Not Enough Wei!");
