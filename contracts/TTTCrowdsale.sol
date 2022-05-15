@@ -54,7 +54,7 @@ contract TTTCrowdsale is Ownable{
 
   }
 
-  // Function to receive ether
+  // Function to receive ether and sell tokens to the client
   fallback() external payable {
     buyTokens(msg.sender);
   }
@@ -68,7 +68,7 @@ contract TTTCrowdsale is Ownable{
   */
 
   // Reverts if beneficiary is not whitelisted
-  modifier isWhitelisted(address _beneficiary) {
+  modifier onlyWhiteListed(address _beneficiary) {
     require(whitelist[_beneficiary]);
     _;
   }
@@ -102,9 +102,18 @@ contract TTTCrowdsale is Ownable{
   // ======
 
 
+  /*
+    MINTED
+  */
+  function _mintDeliverTokens(address _beneficiary, uint256 _tokenAmount) internal {
+    token.mint(_beneficiary, _tokenAmount);
+  }
+
+  // ======
+
   // Pre-transaction checks
   function preTransactionValidate(address _beneficiary, uint256 weiAmount) internal 
-    isWhitelisted(_beneficiary)
+    onlyWhiteListed(_beneficiary)
     onlyWhileOpen()
   {
     require(_beneficiary != address(0), "Wrong Beneficiary!");
@@ -126,8 +135,9 @@ contract TTTCrowdsale is Ownable{
     // Update the number of raised funds
     weiRaised = weiRaised.add(weiAmount);
 
-    // Emit tokens to the beneficiary
-    token.transfer(beneficiary, tokens_to_get);
+    // TODO recalculate amount of tokens here
+    // Mint and send tokens to the beneficiary
+    _mintDeliverTokens(beneficiary, tokens_to_get);
 
     emit TokenPurchase(
       msg.sender,
