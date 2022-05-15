@@ -87,7 +87,7 @@ contract Crowdsale {
     uint256 _weiAmount
   )
     internal
-    virtual 
+    virtual
   {
     require(_beneficiary != address(0));
     require(_weiAmount != 0);
