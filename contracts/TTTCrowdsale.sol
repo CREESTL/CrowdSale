@@ -9,7 +9,12 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract TTTCrowdsale is Ownable{
 
   using SafeMath for uint256;
+  // Whitelist of users who can transfer ether to this crowdsale
   mapping(address => bool) public whitelist;
+
+  // Opening and closing time of crowdsale
+  uint256 public openingTime;
+  uint256 public closingTime;
 
   // The token being sold
   TTT public token;
@@ -31,14 +36,22 @@ contract TTTCrowdsale is Ownable{
     uint256 amount // amount tokens purchased
   );
 
-  constructor(uint256 _rate, address _wallet, TTT _token) {
+  constructor(uint256 _rate, address _wallet, TTT _token, 
+              uint256 _openingTime, uint256 _closingTime) 
+  {
     require(_rate > 0, "Wrong Rate!");
     require(_wallet != address(0), "Wrong Wallet Address!");
     require(address(_token) != address(0), "Wrong Token Address!");
+    // solium-disable-next-line security/no-block-members
+    require(_openingTime >= block.timestamp, "Wrong Opening Time!");
+    require(_closingTime >= _openingTime, "Can't Close Before Open!");
 
     rate = _rate;
     wallet = payable(_wallet);
     token = _token;
+    openingTime = _openingTime;
+    closingTime = _closingTime;
+
   }
 
   // Function to receive ether
@@ -51,7 +64,7 @@ contract TTTCrowdsale is Ownable{
   }
 
   /*
-    WHITELISTS
+    WHITELISTED
   */
 
   // Reverts if beneficiary is not whitelisted
@@ -69,16 +82,34 @@ contract TTTCrowdsale is Ownable{
   function removeFromWhitelist(address _beneficiary) external onlyOwner {
     whitelist[_beneficiary] = false;
   }
+  // ======
+
+  /*
+    TIMED
+  */
+  // Reverts if not in crowdsale time range
+  modifier onlyWhileOpen {
+    // solium-disable-next-line security/no-block-members
+    require(block.timestamp >= openingTime && block.timestamp <= closingTime);
+    _;
+  }
+
+  // Checks whether the period in which the crowdsale is open has ended
+  function hasClosed() public view returns (bool) {
+    // solium-disable-next-line security/no-block-members
+    return block.timestamp > closingTime;
+  }
+  // ======
+
 
   // Pre-transaction checks
   function preTransactionValidate(address _beneficiary, uint256 weiAmount) internal 
     isWhitelisted(_beneficiary)
+    onlyWhileOpen()
   {
     require(_beneficiary != address(0), "Wrong Beneficiary!");
     require(weiAmount != 0, "Not Enough Wei!");
   }
-  // ======
-
 
   // Main function 
   // beneficiary - gets the tokens
