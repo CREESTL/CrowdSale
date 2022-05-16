@@ -1,12 +1,9 @@
+require('dotenv').config()
 require("@nomiclabs/hardhat-waffle");
 
-task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
-  const accounts = await hre.ethers.getSigners();
-
-  for (const account of accounts) {
-    console.log(account.address);
-  }
-});
+// Add some .env individual variables
+const INFURA_PROJECT_ID = process.env.INFURA_PROJECT_ID;
+const RINKEBY_PRIVATE_KEY = process.env.RINKEBY_PRIVATE_KEY;
 
 
 module.exports = {
@@ -15,6 +12,10 @@ module.exports = {
     hardhat: {
       gas: 2100000,
       gasPrice: 8000000000,
+    },
+    rinkeby: {
+      url: `https://rinkeby.infura.io/v3/${INFURA_PROJECT_ID}`,
+      accounts: RINKEBY_PRIVATE_KEY ? [RINKEBY_PRIVATE_KEY] : [],
     },
   },
   solidity: {
