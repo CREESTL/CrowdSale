@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
 import "./TTT.sol";
@@ -67,6 +68,14 @@ contract TTTCrowdsale is Ownable{
     buyTokens(msg.sender);
   }
 
+  // Getters for opening and closing time 
+  function getOpeningTime() public view returns (uint256) {
+    return openingTime;
+  }
+
+  function getClosingTime() public view returns (uint256) {
+    return closingTime;
+  }
   /*
     WHITELISTED
   */
@@ -167,8 +176,8 @@ contract TTTCrowdsale is Ownable{
     );
 
     // TODO choose one
-    // wallet.transfer(msg.value);
-    wallet.call{value: msg.value};
+    wallet.transfer(msg.value);
+    //wallet.call{value: msg.value};
   }
 
 }
