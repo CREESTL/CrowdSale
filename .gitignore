@@ -11,3 +11,5 @@ artifacts
 
 # Node File
 package-lock.json
+
+.env
