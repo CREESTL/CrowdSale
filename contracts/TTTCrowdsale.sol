@@ -176,6 +176,7 @@ contract TTTCrowdsale is Ownable{
     );
 
     // TODO choose one
+    // Transfer collected funds to wallet
     wallet.transfer(msg.value);
     //wallet.call{value: msg.value};
   }
