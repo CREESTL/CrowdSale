@@ -39,20 +39,18 @@ contract TTTCrowdsale is Ownable{
     uint256 amount // amount tokens purchased
   );
 
-  constructor(address _wallet, TTT _token, 
-              uint256 _openingTime) 
+  constructor(address _wallet, TTT _token) 
   {
     require(_wallet != address(0), "Wrong Wallet Address!");
     require(address(_token) != address(0), "Wrong Token Address!");
-    // solium-disable-next-line security/no-block-members
-    require(_openingTime >= block.timestamp, "Wrong Opening Time!");
 
     // _rate = tokens * 10 ^ (decimals) / wei (sent)
     // Default rate is 42
     rate = 42;
     wallet = payable(_wallet);
     token = _token;
-    openingTime = _openingTime;
+    // Crowdsale is open right after it's deployed
+    openingTime = block.timestamp;
     // Closing time is exactly 3 days + 14 days + 30 days after opening time
     closingTime = openingTime + 3 days + 2 weeks + 30 days;
     // First phase lasts for 3 days since opening
@@ -82,7 +80,7 @@ contract TTTCrowdsale is Ownable{
 
   // Reverts if beneficiary is not whitelisted
   modifier onlyWhiteListed(address _beneficiary) {
-    require(whitelist[_beneficiary]);
+    require(whitelist[_beneficiary], "Sender Is Not In Whitelist!");
     _;
   }
 
@@ -103,7 +101,7 @@ contract TTTCrowdsale is Ownable{
   // Reverts if not in crowdsale time range
   modifier onlyWhileOpen {
     // solium-disable-next-line security/no-block-members
-    require(block.timestamp >= openingTime && block.timestamp <= closingTime);
+    require(block.timestamp >= openingTime && block.timestamp <= closingTime, "Crowdsale Has Been Closed!");
     _;
   }
 
