@@ -10,13 +10,14 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract TTTCrowdsale is Ownable{
 
   using SafeMath for uint256;
+  
   // Whitelist of users who can transfer ether to this crowdsale
   mapping(address => bool) public whitelist;
 
   // Opening and closing time of crowdsale
   uint256 public openingTime;
   uint256 public closingTime;
-  // End time of last of three phases
+  // End time of each of three phases
   uint256 public phaseEndTime;
 
   // The token being sold
@@ -57,7 +58,7 @@ contract TTTCrowdsale is Ownable{
     phaseEndTime = openingTime + 3 days;
   }
 
-  // Function to receive ether and sell tokens to the client
+  // Functions to receive ether and sell tokens to the client
   fallback() external payable {
     buyTokens(msg.sender);
   }
@@ -112,6 +113,7 @@ contract TTTCrowdsale is Ownable{
 
   // Changes phase according to current time
   modifier checkChangePhase {
+    // First phase lasts for 3 days
     // After first 3 days starts the next 1-month phase
     if (block.timestamp > phaseEndTime) {
       // Assuming that 1 month has 30 days
