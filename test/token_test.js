@@ -3,8 +3,10 @@ const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
 
+// Tests for TTT.sol
 describe("Tasty Tomato Token", function () {
-
+  
+  // Constants to be used afterwards
   let _ttt;
   let ttt;
   let owner;
@@ -12,6 +14,7 @@ describe("Tasty Tomato Token", function () {
   let addr2;
   let addrs;
 
+  // Hook
   beforeEach(async function () {
     // Get the ContractFactory and Signers here.
     _ttt = await ethers.getContractFactory("TTT");
