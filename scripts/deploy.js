@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: MIT
 const hre = require("hardhat");
 
+/*
+  Run it with `npx hardhat run --network *desired network name*`
+*/
+
 async function main() {
 
   // Get different avaliable addresses
@@ -14,7 +18,7 @@ async function main() {
 
   // Deploy the crowdsale
   _tttCrowdsale = await ethers.getContractFactory("TTTCrowdsale");
-  tttCrowdsale = await _tttCrowdsale.deploy(owner.address, ttt.address, Date.now());
+  tttCrowdsale = await _tttCrowdsale.deploy(owner.address, ttt.address);
   await tttCrowdsale.deployed();
 
   console.log("TTT deployed to:", ttt.address);
