@@ -66,13 +66,17 @@ contract TTTCrowdsale is Ownable{
     buyTokens(msg.sender);
   }
 
-  // Getters for opening and closing time 
+  // Getters 
   function getOpeningTime() public view returns (uint256) {
     return openingTime;
   }
 
   function getClosingTime() public view returns (uint256) {
     return closingTime;
+  }
+
+  function getWeiRaised() public view returns (uint256) {
+    return weiRaised;
   }
 
   /*
@@ -164,7 +168,6 @@ contract TTTCrowdsale is Ownable{
     // Update the number of raised funds
     weiRaised = weiRaised.add(weiAmount);
 
-    // TODO recalculate amount of tokens here
     // Mint and send tokens to the beneficiary
     _mintDeliverTokens(beneficiary, tokens_to_get);
 
@@ -175,10 +178,8 @@ contract TTTCrowdsale is Ownable{
       tokens_to_get
     );
 
-    // TODO choose one
     // Transfer collected funds to wallet
     wallet.transfer(msg.value);
-    //wallet.call{value: msg.value};
   }
 
 }
