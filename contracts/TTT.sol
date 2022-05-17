@@ -9,5 +9,6 @@ contract TTT is ERC20 {
     // Make internal _mint() public
     function mint(address account, uint amount) public {
         _mint(account, amount);
+        
     } 
 }

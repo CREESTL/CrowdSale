@@ -11,6 +11,7 @@ contract TTTCrowdsale is Ownable{
 
   using SafeMath for uint256;
   
+  
   // Whitelist of users who can transfer ether to this crowdsale
   mapping(address => bool) public whitelist;
 
