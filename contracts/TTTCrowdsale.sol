@@ -52,7 +52,7 @@ contract TTTCrowdsale is Ownable{
     // Crowdsale is open right after it's deployed
     openingTime = block.timestamp;
     // Closing time is exactly 3 days + 14 days + 30 days after opening time
-    closingTime = openingTime + 3 days + 2 weeks + 30 days;
+    closingTime = openingTime + 47 days;
     // First phase lasts for 3 days since opening
     phaseEndTime = openingTime + 3 days;
   }
@@ -74,6 +74,7 @@ contract TTTCrowdsale is Ownable{
   function getClosingTime() public view returns (uint256) {
     return closingTime;
   }
+
   /*
     WHITELISTED
   */
@@ -113,7 +114,8 @@ contract TTTCrowdsale is Ownable{
       phaseEndTime += 30 days;
       rate = 21;
     // After 1-month phase starts the last 2-weeks phase
-    } else if (block.timestamp > phaseEndTime) {
+    } 
+    if (block.timestamp > phaseEndTime) {
       phaseEndTime += 2 weeks;
       rate = 8;
     }
