@@ -1,5 +1,6 @@
 require('dotenv').config()
 require("@nomiclabs/hardhat-waffle");
+require("solidity-coverage");
 
 // Add some .env individual variables
 const INFURA_PROJECT_ID = process.env.INFURA_PROJECT_ID;
